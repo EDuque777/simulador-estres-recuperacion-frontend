@@ -1,0 +1,295 @@
+/* EabjLoader */ 
+.absolute {
+  position: absolute;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.loader {
+  display: flex;
+  margin: 0.25em 0;
+}
+
+.w-2 {
+  width: 0.5em;
+}
+
+.dash {
+  animation: dashArray 2s ease-in-out infinite, dashOffset 2s linear infinite;
+}
+
+.spin {
+  animation: spinDashArray 2s ease-in-out infinite, spin 8s ease-in-out infinite,
+    dashOffset 2s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes dashArray {
+  0% {
+    stroke-dasharray: 0 1 359 0;
+  }
+
+  50% {
+    stroke-dasharray: 0 359 1 0;
+  }
+
+  100% {
+    stroke-dasharray: 359 1 0 0;
+  }
+}
+
+@keyframes spinDashArray {
+  0% {
+    stroke-dasharray: 270 90;
+  }
+
+  50% {
+    stroke-dasharray: 0 360;
+  }
+
+  100% {
+    stroke-dasharray: 250 90;
+  }
+}
+
+@keyframes dashOffset {
+  0% {
+    stroke-dashoffset: 385;
+  }
+
+  100% {
+    stroke-dashoffset: 5;
+  }
+}
+
+@keyframes spin {
+  0% {
+    rotate: 0deg;
+  }
+
+  12.5%,
+  25% {
+    rotate: 270deg;
+  }
+
+  37.5%,
+  50% {
+    rotate: 540deg;
+  }
+
+  62.5%,
+  75% {
+    rotate: 810deg;
+  }
+
+  87.5%,
+  100% {
+    rotate: 1080deg;
+  }
+}
+
+
+/* CyberPlasmaLoader */ 
+.cyber-loader-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 0 35px rgba(0, 255, 204, 0.15));
+}
+
+.plasma-vial {
+  --neon-cyan: #00ffcc;
+  --neon-blue: #0066ff;
+
+  position: relative;
+  width: 80px;
+  height: 200px;
+  border-radius: 40px;
+  background: linear-gradient(180deg, #050b14 0%, #020408 100%);
+  border: 2px solid rgba(0, 255, 204, 0.15);
+  box-shadow:
+    0 0 20px 0 rgba(0, 255, 204, 0.1),
+    inset 0 0 25px rgba(0, 102, 255, 0.4),
+    inset 0 -15px 30px rgba(0, 255, 204, 0.2);
+  overflow: hidden;
+  animation: vial-pulse 4s ease-in-out infinite;
+}
+
+.plasma-vial::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  box-shadow:
+    inset -6px -6px 15px rgba(0, 0, 0, 0.8),
+    inset 6px 6px 15px rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.plasma-vial::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  width: 12px;
+  height: 170px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  border-radius: 10px;
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.vial-base {
+  width: 100px;
+  height: 20px;
+  background: linear-gradient(90deg, #1a1c23, #2a2d38, #1a1c23);
+  border-radius: 10px;
+  margin-top: -10px;
+  z-index: 20;
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.8),
+    inset 0 2px 2px rgba(255, 255, 255, 0.1),
+    0 -2px 10px rgba(0, 255, 204, 0.3);
+  border: 1px solid #333;
+}
+
+.fluid-chamber {
+  position: absolute;
+  inset: -10px;
+  filter: url(#gooeyPlasmaFilter) hue-rotate(0deg);
+  -webkit-filter: url(#gooeyPlasmaFilter) hue-rotate(0deg);
+  animation: fluid-colors 6s ease-in-out infinite;
+  z-index: 1;
+}
+
+.plasma-pool,
+.droplet {
+  position: absolute;
+  background: linear-gradient(
+    180deg,
+    var(--neon-cyan) 10%,
+    var(--neon-blue) 90%
+  );
+  border-radius: 50%;
+}
+
+.bottom-pool {
+  width: 100px;
+  height: 60px;
+  bottom: 0;
+  left: 0;
+  border-radius: 40% 60% 50% 50%;
+  animation: pool-shift 4s ease-in-out infinite alternate;
+}
+
+.top-pool {
+  width: 100px;
+  height: 40px;
+  top: 0;
+  left: 0;
+  border-radius: 50% 50% 60% 40%;
+  opacity: 0.8;
+  animation: pool-shift 3s ease-in-out infinite alternate-reverse;
+}
+
+.droplet {
+  bottom: 20px;
+}
+
+.d-1 {
+  width: 35px;
+  height: 35px;
+  left: 15px;
+  animation: antigrav-flow 4s cubic-bezier(0.4, 0.1, 0.3, 1) infinite;
+}
+
+.d-2 {
+  width: 45px;
+  height: 45px;
+  left: 35px;
+  animation: antigrav-flow 5.5s cubic-bezier(0.5, 0.1, 0.2, 1) infinite 1.2s;
+}
+
+.d-3 {
+  width: 24px;
+  height: 24px;
+  left: 55px;
+  animation: antigrav-flow 3.8s cubic-bezier(0.4, 0.2, 0.4, 1) infinite 0.7s;
+}
+
+.d-4 {
+  width: 28px;
+  height: 28px;
+  left: 25px;
+  animation: antigrav-flow 4.5s cubic-bezier(0.3, 0.1, 0.4, 1) infinite 2.5s;
+}
+
+.d-5 {
+  width: 20px;
+  height: 20px;
+  left: 45px;
+  animation: antigrav-flow 3s cubic-bezier(0.4, 0.1, 0.2, 1) infinite 3s;
+}
+
+@keyframes antigrav-flow {
+  0% {
+    transform: translateY(20px) scale(0.8) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-170px) scale(1.15) rotate(180deg);
+  }
+
+  100% {
+    transform: translateY(20px) scale(0.8) rotate(360deg);
+  }
+}
+
+@keyframes pool-shift {
+  0% {
+    transform: scaleX(1) translateX(-5px);
+  }
+
+  100% {
+    transform: scaleX(1.1) translateX(5px);
+  }
+}
+
+@keyframes fluid-colors {
+  0%,
+  100% {
+    filter: url(#gooeyPlasmaFilter) hue-rotate(0deg);
+    -webkit-filter: url(#gooeyPlasmaFilter) hue-rotate(0deg);
+  }
+
+  50% {
+    filter: url(#gooeyPlasmaFilter) hue-rotate(40deg);
+    -webkit-filter: url(#gooeyPlasmaFilter) hue-rotate(40deg);
+  }
+}
+
+@keyframes vial-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px 0 #7CCA9E,
+      inset 0 0 25px #8482F5,
+      inset 0 -15px 30px #C9C8FB;
+  }
+
+  50% {
+    box-shadow:
+      0 0 35px 5px #C9C8FB,
+      inset 0 0 40px #8482F5,
+      inset 0 -20px 45px #7CCA9E;
+  }
+}
