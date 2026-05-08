@@ -14,7 +14,7 @@
   z-index: -1;
 }
 
-.gooey-button__blobs div {
+.gooey-button-purple__blobs div {
   background-color: #8482F5;
   width: 34%;
   height: 100%;
@@ -23,6 +23,17 @@
   transform: scale(1.4) translateY(125%) translateZ(0);
   transition: all 700ms ease;
 }
+
+.gooey-button-green__blobs div {
+  background-color: #7CCA9E;
+  width: 34%;
+  height: 100%;
+  border-radius: 100%;
+  position: absolute;
+  transform: scale(1.4) translateY(125%) translateZ(0);
+  transition: all 700ms ease;
+}
+
 
 .gooey-button__blobs div:nth-child(1) {
   left: -5%;

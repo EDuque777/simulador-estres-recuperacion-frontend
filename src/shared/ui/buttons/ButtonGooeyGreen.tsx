@@ -10,7 +10,7 @@ type ButtonGooeyProps = {
   width: string;
 };
 
-export function ButtonGooey({
+export function ButtonGooeyGreen({
   type,
   text,
   onClick,
@@ -23,10 +23,10 @@ export function ButtonGooey({
         type={type}
         onClick={onClick}
         disabled={disabled}
-        className={`gooey-button relative z-99 inline-block cursor-pointer overflow-hidden border-2 border-[#8482F5] px-[1.6em] py-[0.9em] align-middle text-[15px] font-bold uppercase tracking-[2px] text-[#8482F5] transition-all duration-700 ease-out hover:text-white ${width}`}
+        className={`gooey-button relative z-99 inline-block cursor-pointer overflow-hidden border-2 border-[#7CCA9E] px-[1.6em] py-[0.9em] align-middle text-[15px] font-bold uppercase tracking-[2px] text-[#7CCA9E] transition-all duration-700 ease-out hover:text-white ${width}`}
       >
         <p>{text}</p>
-        <div className="gooey-button__blobs">
+        <div className="gooey-button__blobs gooey-button-green__blobs">
           <div />
           <div />
           <div />

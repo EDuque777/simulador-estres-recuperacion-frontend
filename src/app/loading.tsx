@@ -1,5 +1,9 @@
-import { AppPreloader } from "@/shared/ui/loaders/AppPreloader";
+import { CyberPlasmaLoader } from "@/shared/ui/loaders/CyberPlasmaLoader";
 
 export default function Loading() {
-  return <AppPreloader minDuration={500} />;
+  return (
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-white">
+      <CyberPlasmaLoader />
+    </div>
+  );
 }

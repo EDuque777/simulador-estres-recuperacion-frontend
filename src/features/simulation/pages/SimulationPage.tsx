@@ -1,9 +1,9 @@
-import { LoginCard } from "../components/LoginCard";
+import { SimulationDashboard } from "../components/SimulationDashboard";
 import Aurora from "@/shared/ui/backgrounds/Aurora";
 
-export function LoginPage() {
+export function SimulationPage() {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-4">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white p-4">
       <div className="absolute inset-0 z-0">
         <Aurora
           colorStops={["#7CCA9E", "#8482F5", "#C9C8FB"]}
@@ -12,9 +12,8 @@ export function LoginPage() {
           speed={1}
         />
       </div>
-
-      <section className="relative z-10 w-full md:w-137.5">
-        <LoginCard />
+      <section className="relative z-10 w-full xl:w-[70%]">
+        <SimulationDashboard />;
       </section>
     </main>
   );

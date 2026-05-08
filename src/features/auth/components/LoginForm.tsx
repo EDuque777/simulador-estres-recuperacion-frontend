@@ -3,8 +3,7 @@
 import React from "react";
 import { InputEmail } from "@/shared/ui/inputs/InputEmail";
 import { InputPassword } from "@/shared/ui/inputs/InputPassword";
-import { ButtonGooey } from "@/shared/ui/buttons/ButtonGooey";
-import { ImArrowUpRight2 } from "react-icons/im";
+import { ButtonGooeyPurple } from "@/shared/ui/buttons/ButtonGooeyPurple";
 
 export function LoginForm() {
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -32,7 +31,7 @@ export function LoginForm() {
         containerStyle="w-full"
         required={false}
       />
-      <ButtonGooey
+      <ButtonGooeyPurple
         type="submit"
         text="Ingresar"
         onClick={() => {}}
