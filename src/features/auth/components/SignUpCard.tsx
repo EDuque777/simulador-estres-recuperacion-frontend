@@ -1,4 +1,4 @@
-import { LoginForm } from "./LoginForm";
+import { SignUpForm } from "./SignUpForm";
 import SplitText from "@/shared/ui/animateText/SplitText";
 import TextType from "@/shared/ui/animateText/TextType";
 import GradientText from "@/shared/ui/animateText/GradientText";
@@ -6,7 +6,7 @@ import Image from "next/image";
 import logoEstresRecuperacion from "../../../../public/img/logoEstresRecuperacion.png";
 import Link from "next/link";
 
-export function LoginCard() {
+export function SignUpCard() {
   return (
     <div className="rounded-[20px] text-black bg-white p-10 shadow-2xl w-full flex flex-col justify-center items-center">
       <div className="w-62.5">
@@ -50,7 +50,7 @@ export function LoginCard() {
           className="text-center leading-snug text-gray-400 font-semibold"
         />
       </div>
-      <LoginForm />
+      <SignUpForm />
       <GradientText
         colors={["#7CCA9E", "#8482F5", "#7CCA9E"]}
         animationSpeed={8}
@@ -65,7 +65,7 @@ export function LoginCard() {
         showBorder={false}
         className="custom-class font-semibold text-center mt-3"
       >
-        <Link href="/sign-up">No estas Registrado? Crea una Cuenta</Link>
+        <Link href="/">Ya Tienes una Cuenta? Inicia Sesion</Link>
       </GradientText>
     </div>
   );

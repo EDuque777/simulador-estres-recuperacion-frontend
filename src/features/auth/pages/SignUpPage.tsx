@@ -1,7 +1,7 @@
-import { LoginCard } from "../components/LoginCard";
+import { SignUpCard } from "../components/SignUpCard";
 import Aurora from "@/shared/ui/backgrounds/Aurora";
 
-export function LoginPage() {
+export function SignUpPage() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white p-4">
       <div className="absolute inset-0 z-0">
@@ -14,7 +14,7 @@ export function LoginPage() {
       </div>
 
       <section className="relative z-10 w-full md:w-137.5">
-        <LoginCard />
+        <SignUpCard />
       </section>
     </main>
   );
