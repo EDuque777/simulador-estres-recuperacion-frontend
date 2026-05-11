@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Manrope } from "next/font/google";
 import { ReduxProvider } from "./providers/ReduxProvider";
+import { AuthFlowModals } from "@/features/auth/components/AuthFlowModals";
 import { AppPreloader } from "@/shared/ui/loaders/AppPreloader";
 import "./globals.css";
 
@@ -37,7 +38,8 @@ export default function RootLayout({
         <ReduxProvider>
           <AppPreloader minDuration={500} />
           {children}
-          </ReduxProvider>
+          <AuthFlowModals />
+        </ReduxProvider>
       </body>
     </html>
   );

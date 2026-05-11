@@ -1,10 +1,11 @@
-import { LoginForm } from "./LoginForm";
+import Image from "next/image";
+import Link from "next/link";
+import GradientText from "@/shared/ui/animateText/GradientText";
 import SplitText from "@/shared/ui/animateText/SplitText";
 import TextType from "@/shared/ui/animateText/TextType";
-import GradientText from "@/shared/ui/animateText/GradientText";
-import Image from "next/image";
 import logoEstresRecuperacion from "../../../../public/img/logoEstresRecuperacion.png";
-import Link from "next/link";
+import { ForgotPasswordButton } from "./ForgotPasswordButton";
+import { LoginForm } from "./LoginForm";
 
 export function LoginCard() {
   return (
@@ -51,14 +52,7 @@ export function LoginCard() {
         />
       </div>
       <LoginForm />
-      <GradientText
-        colors={["#7CCA9E", "#8482F5", "#7CCA9E"]}
-        animationSpeed={8}
-        showBorder={false}
-        className="custom-class font-semibold text-center"
-      >
-        ¿Olvidaste tu contraseña?
-      </GradientText>
+      <ForgotPasswordButton />
       <GradientText
         colors={["#7CCA9E", "#8482F5", "#7CCA9E"]}
         animationSpeed={8}

@@ -1,10 +1,10 @@
-import { SignUpForm } from "./SignUpForm";
+import Image from "next/image";
+import Link from "next/link";
+import GradientText from "@/shared/ui/animateText/GradientText";
 import SplitText from "@/shared/ui/animateText/SplitText";
 import TextType from "@/shared/ui/animateText/TextType";
-import GradientText from "@/shared/ui/animateText/GradientText";
-import Image from "next/image";
 import logoEstresRecuperacion from "../../../../public/img/logoEstresRecuperacion.png";
-import Link from "next/link";
+import { SignUpForm } from "./SignUpForm";
 
 export function SignUpCard() {
   return (
@@ -22,7 +22,7 @@ export function SignUpCard() {
       </div>
       <div className="flex flex-col w-full mb-7.5 mt-7.5">
         <SplitText
-          text="Iniciar sesión"
+          text="Registrate"
           className="text-[35px] md:text-[40px] font-bold text-center leading-tight text-[#8482F5]"
           delay={50}
           duration={1.25}
@@ -56,14 +56,6 @@ export function SignUpCard() {
         animationSpeed={8}
         showBorder={false}
         className="custom-class font-semibold text-center"
-      >
-        ¿Olvidaste tu contraseña?
-      </GradientText>
-      <GradientText
-        colors={["#7CCA9E", "#8482F5", "#7CCA9E"]}
-        animationSpeed={8}
-        showBorder={false}
-        className="custom-class font-semibold text-center mt-3"
       >
         <Link href="/">Ya Tienes una Cuenta? Inicia Sesion</Link>
       </GradientText>

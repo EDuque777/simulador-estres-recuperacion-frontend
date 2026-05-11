@@ -1,37 +1,35 @@
 "use client";
 
-import React from "react";
-import { InputText } from "@/shared/ui/inputs/InputText";
+import { ButtonGooeyPurple } from "@/shared/ui/buttons/ButtonGooeyPurple";
 import { InputEmail } from "@/shared/ui/inputs/InputEmail";
 import { InputPassword } from "@/shared/ui/inputs/InputPassword";
-import { ButtonGooeyPurple } from "@/shared/ui/buttons/ButtonGooeyPurple";
+import { InputText } from "@/shared/ui/inputs/InputText";
+import { useSignUpForm } from "../hooks/useSignUpForm";
 
 export function SignUpForm() {
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const { handleSubmit, isLoading } = useSignUpForm();
 
-    console.log("Enviando login");
-  };
   return (
     <form
+      noValidate
       onSubmit={handleSubmit}
       className="flex w-full flex-col items-center gap-7.5"
     >
       <InputText
-        id="name"
-        name="name"
+        id="firstName"
+        name="firstName"
         label="Nombre"
         type="text"
+        autoComplete="given-name"
         containerStyle="w-full"
-        required={false}
       />
       <InputText
         id="lastName"
         name="lastName"
         label="Apellido"
         type="text"
+        autoComplete="family-name"
         containerStyle="w-full"
-        required={false}
       />
       <InputEmail
         id="email"
@@ -39,26 +37,25 @@ export function SignUpForm() {
         label="Correo electrónico"
         type="email"
         containerStyle="w-full"
-        required={false}
       />
       <InputPassword
         id="password"
         name="password"
         label="Contraseña"
         containerStyle="w-full"
-        required={false}
+        autoComplete="new-password"
       />
       <InputPassword
         id="confirmPassword"
         name="confirmPassword"
         label="Confirmar Contraseña"
         containerStyle="w-full"
-        required={false}
+        autoComplete="new-password"
       />
       <ButtonGooeyPurple
         type="submit"
-        text="Ingresar"
-        onClick={() => {}}
+        text={isLoading ? "Enviando" : "Ingresar"}
+        disabled={isLoading}
         width="w-full z-999"
       />
     </form>

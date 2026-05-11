@@ -13,7 +13,7 @@ export function SimulationPage() {
         />
       </div>
       <section className="relative z-10 w-full xl:w-[70%]">
-        <SimulationDashboard />;
+        <SimulationDashboard />
       </section>
     </main>
   );

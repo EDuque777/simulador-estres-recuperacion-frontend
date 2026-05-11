@@ -1,18 +1,16 @@
 "use client";
 
-import React from "react";
+import { ButtonGooeyPurple } from "@/shared/ui/buttons/ButtonGooeyPurple";
 import { InputEmail } from "@/shared/ui/inputs/InputEmail";
 import { InputPassword } from "@/shared/ui/inputs/InputPassword";
-import { ButtonGooeyPurple } from "@/shared/ui/buttons/ButtonGooeyPurple";
+import { useLoginForm } from "../hooks/useLoginForm";
 
 export function LoginForm() {
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const { handleSubmit, isLoading } = useLoginForm();
 
-    console.log("Enviando login");
-  };
   return (
     <form
+      noValidate
       onSubmit={handleSubmit}
       className="flex w-full flex-col items-center gap-7.5"
     >
@@ -22,19 +20,17 @@ export function LoginForm() {
         label="Correo electrónico"
         type="email"
         containerStyle="w-full"
-        required={false}
       />
       <InputPassword
         id="password"
         name="password"
         label="Contraseña"
         containerStyle="w-full"
-        required={false}
       />
       <ButtonGooeyPurple
         type="submit"
-        text="Ingresar"
-        onClick={() => {}}
+        text={isLoading ? "Enviando" : "Ingresar"}
+        disabled={isLoading}
         width="w-full z-999"
       />
     </form>

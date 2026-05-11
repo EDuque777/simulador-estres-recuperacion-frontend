@@ -10,10 +10,11 @@ type InputPasswordProps = {
   id: string;
   name: string;
   label: string;
-  autoComplete?: string;
-  required: boolean;
   containerStyle: string;
-};
+} & Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "id" | "name" | "type" | "className"
+>;
 
 const particles = [
   { x: 0.2, y: -0.4, delay: "0.1s" },
@@ -29,8 +30,9 @@ export function InputPassword({
   name,
   label,
   autoComplete = "current-password",
-  required,
   containerStyle,
+  required = false,
+  ...inputProps
 }: InputPasswordProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -47,6 +49,7 @@ export function InputPassword({
         name={name}
         autoComplete={autoComplete}
         placeholder=" "
+        {...inputProps}
         className="peer w-full rounded-[10px] border-2 border-[#8482F5] bg-white pl-10 pr-3.75 pt-3.75 pb-3.75 text-base text-black outline-none transition-all duration-400 ease-out focus:border-[#7CCA9E] focus:shadow-[0_5px_8px_rgba(124,202,158,0.3),0_10px_20px_rgba(124,202,158,0.2),0_15px_40px_rgba(124,202,158,0.15),0_20px_60px_rgba(124,202,158,0.1)]"
       />
 
