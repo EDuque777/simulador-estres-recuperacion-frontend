@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { useVerifySignUpCodeMutation } from "../api/authApi";
+import { notifyAuthError, notifyAuthSuccess } from "../lib/authToast";
 import { setCredentials } from "../slices/authSlice";
 import type { VerifyCodeRequest } from "../types/auth.types";
 
@@ -15,16 +16,27 @@ export const useVerifySignUpCode = () => {
 
   const verifySignUpCode = useCallback(
     async (request: VerifyCodeRequest) => {
-      const response = await verifySignUpCodeMutation(request).unwrap();
+      const result = await verifySignUpCodeMutation(request);
+
+      if ("error" in result) {
+        notifyAuthError("No se pudo verificar el registro", result.error);
+        throw new Error("VERIFY_SIGN_UP_CODE_FAILED");
+      }
 
       dispatch(
         setCredentials({
-          accessToken: response.accessToken,
-          user: response.user,
+          accessToken: result.data.accessToken,
+          user: result.data.user,
         }),
       );
 
-      return response;
+      notifyAuthSuccess(
+        "Registro verificado",
+        result.data.message,
+        "Tu cuenta fue verificada correctamente.",
+      );
+
+      return result.data;
     },
     [dispatch, verifySignUpCodeMutation],
   );

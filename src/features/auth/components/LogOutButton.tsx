@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ButtonGooeyRed } from "@/shared/ui/buttons/ButtonGooeyRed";
 import { useLogOut } from "../hooks/useLogOut";
@@ -7,9 +8,12 @@ import { useLogOut } from "../hooks/useLogOut";
 export function LogOutButton() {
   const router = useRouter();
   const { isLoading, logOut } = useLogOut();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const isButtonLoading = isLoading || isRedirecting;
 
   const handleLogOut = async () => {
     try {
+      setIsRedirecting(true);
       await logOut();
     } catch {
       // La sesion local se limpia en el hook; el usuario debe salir igual.
@@ -23,8 +27,8 @@ export function LogOutButton() {
       type="button"
       text="Cerrar sesion"
       onClick={handleLogOut}
-      isLoading={isLoading}
-      disabled={isLoading}
+      isLoading={isButtonLoading}
+      disabled={isButtonLoading}
       width="w-[200px] z-999"
     />
   );

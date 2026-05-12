@@ -1,17 +1,16 @@
 "use client";
 
-import { useCallback, type ChangeEvent, type FormEvent } from "react";
+import { useCallback, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { usePasswordPairValidation } from "@/shared/ui/passwordStrength/usePasswordPairValidation";
 import { getFormValue } from "../lib/getFormValue";
+import { waitForAuthToastToClose } from "../lib/authToast";
 import {
   type PasswordResetStep,
   useAuthFlowStore,
 } from "../stores/authFlowStore";
 import { useForgotPassword } from "./useForgotPassword";
 import { useResetPassword } from "./useResetPassword";
-
-const MODAL_EXIT_DURATION_MS = 360;
 
 const getPasswordResetTitle = (step: PasswordResetStep) => {
   if (step === "code") {
@@ -29,6 +28,7 @@ export const usePasswordResetFlow = () => {
   const router = useRouter();
   const { forgotPassword, isLoading: isSendingCode } = useForgotPassword();
   const { resetPassword, isLoading: isResettingPassword } = useResetPassword();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const passwordValidation = usePasswordPairValidation();
   const {
     confirmPassword,
@@ -113,6 +113,7 @@ export const usePasswordResetFlow = () => {
       }
 
       try {
+        setIsRedirecting(true);
         await resetPassword({
           email: passwordResetEmail,
           code: passwordResetCode,
@@ -120,11 +121,11 @@ export const usePasswordResetFlow = () => {
           confirmPassword,
         });
 
+        await waitForAuthToastToClose();
         closePasswordResetModal();
-        window.setTimeout(() => {
-          router.push("/");
-        }, MODAL_EXIT_DURATION_MS);
+        router.push("/");
       } catch {
+        setIsRedirecting(false);
         // Mantener este paso para corregir contrasenas o volver a cambiar codigo.
       }
     },
@@ -154,7 +155,7 @@ export const usePasswordResetFlow = () => {
     handlePasswordSubmit,
     handleResendCode,
     handleTryAnotherEmail,
-    isResettingPassword,
+    isResettingPassword: isResettingPassword || isRedirecting,
     isSendingCode,
     passwordResetCode,
     passwordResetDirection,

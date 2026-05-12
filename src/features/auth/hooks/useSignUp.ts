@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import { useSignUpMutation } from "../api/authApi";
+import { notifyAuthError, notifyAuthSuccess } from "../lib/authToast";
 import type { SignUpRequest } from "../types/auth.types";
 
 export const useSignUp = () => {
@@ -9,7 +10,22 @@ export const useSignUp = () => {
     useSignUpMutation();
 
   const signUp = useCallback(
-    (request: SignUpRequest) => signUpMutation(request).unwrap(),
+    async (request: SignUpRequest) => {
+      const result = await signUpMutation(request);
+
+      if ("error" in result) {
+        notifyAuthError("No se pudo crear la cuenta", result.error);
+        throw new Error("SIGN_UP_FAILED");
+      }
+
+      notifyAuthSuccess(
+        "Registro iniciado",
+        result.data.message,
+        "Te enviamos un codigo de verificacion al correo.",
+      );
+
+      return result.data;
+    },
     [signUpMutation],
   );
 

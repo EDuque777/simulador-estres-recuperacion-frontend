@@ -13,21 +13,21 @@ export const useRefreshToken = () => {
   ] = useRefreshTokenMutation();
 
   const refreshToken = useCallback(async () => {
-    try {
-      const response = await refreshTokenMutation().unwrap();
+    const result = await refreshTokenMutation();
 
-      dispatch(
-        setCredentials({
-          accessToken: response.accessToken,
-          user: response.user,
-        }),
-      );
-
-      return response;
-    } catch (error) {
+    if ("error" in result) {
       dispatch(clearCredentials());
-      throw error;
+      throw new Error("REFRESH_TOKEN_FAILED");
     }
+
+    dispatch(
+      setCredentials({
+        accessToken: result.data.accessToken,
+        user: result.data.user,
+      }),
+    );
+
+    return result.data;
   }, [dispatch, refreshTokenMutation]);
 
   return {

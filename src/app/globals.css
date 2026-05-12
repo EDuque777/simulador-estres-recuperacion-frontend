@@ -5,3 +5,11 @@
   --font-mono: var(--font-geist-mono);
   --font-manrope: var(--font-manrope);
 }
+
+:root {
+  --sileo-width: min(380px, calc(100vw - 2rem));
+}
+
+[data-sileo-viewport] {
+  z-index: 2147483647 !important;
+}

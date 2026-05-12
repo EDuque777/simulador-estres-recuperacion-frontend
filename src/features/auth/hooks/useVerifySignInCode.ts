@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { useVerifySignInCodeMutation } from "../api/authApi";
+import { notifyAuthError, notifyAuthSuccess } from "../lib/authToast";
 import { setCredentials } from "../slices/authSlice";
 import type { VerifyCodeRequest } from "../types/auth.types";
 
@@ -15,16 +16,27 @@ export const useVerifySignInCode = () => {
 
   const verifySignInCode = useCallback(
     async (request: VerifyCodeRequest) => {
-      const response = await verifySignInCodeMutation(request).unwrap();
+      const result = await verifySignInCodeMutation(request);
+
+      if ("error" in result) {
+        notifyAuthError("No se pudo verificar el ingreso", result.error);
+        throw new Error("VERIFY_SIGN_IN_CODE_FAILED");
+      }
 
       dispatch(
         setCredentials({
-          accessToken: response.accessToken,
-          user: response.user,
+          accessToken: result.data.accessToken,
+          user: result.data.user,
         }),
       );
 
-      return response;
+      notifyAuthSuccess(
+        "Ingreso verificado",
+        result.data.message,
+        "Sesion iniciada correctamente.",
+      );
+
+      return result.data;
     },
     [dispatch, verifySignInCodeMutation],
   );

@@ -9,10 +9,9 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthFlowStore } from "../stores/authFlowStore";
+import { waitForAuthToastToClose } from "../lib/authToast";
 import { useVerifySignInCode } from "./useVerifySignInCode";
 import { useVerifySignUpCode } from "./useVerifySignUpCode";
-
-const MODAL_EXIT_DURATION_MS = 360;
 
 export const useVerificationCodeForm = () => {
   const router = useRouter();
@@ -26,7 +25,8 @@ export const useVerificationCodeForm = () => {
   const { verifySignUpCode, isLoading: isVerifyingSignUp } =
     useVerifySignUpCode();
   const [code, setCode] = useState("");
-  const isLoading = isVerifyingSignIn || isVerifyingSignUp;
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const isLoading = isVerifyingSignIn || isVerifyingSignUp || isRedirecting;
   const normalizedCode = code.trim();
 
   const title = useMemo(() => {
@@ -51,6 +51,7 @@ export const useVerificationCodeForm = () => {
       }
 
       try {
+        setIsRedirecting(true);
         const request = {
           email: verificationEmail,
           code: normalizedCode,
@@ -63,11 +64,11 @@ export const useVerificationCodeForm = () => {
         }
 
         setCode("");
+        await waitForAuthToastToClose();
         closeVerificationModal();
-        window.setTimeout(() => {
-          router.push("/simulacion");
-        }, MODAL_EXIT_DURATION_MS);
+        router.push("/simulacion");
       } catch {
+        setIsRedirecting(false);
         // Mantener el modal abierto para que el usuario pueda corregir el codigo.
       }
     },

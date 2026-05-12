@@ -4,6 +4,7 @@ import { ReduxProvider } from "./providers/ReduxProvider";
 import { AuthSessionInitializer } from "@/features/auth/components/AuthSessionInitializer";
 import { AuthFlowModals } from "@/features/auth/components/AuthFlowModals";
 import { AppPreloader } from "@/shared/ui/loaders/AppPreloader";
+import { AppToaster } from "@/shared/ui/toasts/AppToaster";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,6 +42,7 @@ export default function RootLayout({
           <AppPreloader minDuration={500} />
           {children}
           <AuthFlowModals />
+          <AppToaster />
         </ReduxProvider>
       </body>
     </html>
