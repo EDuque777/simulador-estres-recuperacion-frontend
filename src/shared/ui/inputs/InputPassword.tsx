@@ -11,6 +11,8 @@ type InputPasswordProps = {
   name: string;
   label: string;
   containerStyle: string;
+  error?: boolean;
+  helperText?: string;
 } & Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "id" | "name" | "type" | "className"
@@ -31,17 +33,35 @@ export function InputPassword({
   label,
   autoComplete = "current-password",
   containerStyle,
+  error = false,
+  helperText,
   required = false,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
   ...inputProps
 }: InputPasswordProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const helperTextId = helperText ? `${id}-helper-text` : undefined;
+  const describedBy =
+    [ariaDescribedBy, helperTextId].filter(Boolean).join(" ") || undefined;
+  const invalid = ariaInvalid ?? (error ? true : undefined);
+  const inputStateClass = error
+    ? "border-red-500 focus:border-red-500 focus:shadow-[0_5px_8px_rgba(239,68,68,0.22),0_10px_20px_rgba(239,68,68,0.16)]"
+    : "border-[#8482F5] focus:border-[#7CCA9E] focus:shadow-[0_5px_8px_rgba(124,202,158,0.3),0_10px_20px_rgba(124,202,158,0.2),0_15px_40px_rgba(124,202,158,0.15),0_20px_60px_rgba(124,202,158,0.1)]";
+  const iconStateClass = error
+    ? "text-red-400 peer-focus:text-red-500"
+    : "text-gray-400 peer-focus:text-[#7CCA9E]";
+    const labelStateClass = error
+  ? "text-red-500 peer-focus:text-red-500 peer-[:not(:focus):not(:placeholder-shown)]:text-red-500"
+  : "text-gray-400 peer-focus:text-[#7CCA9E] peer-[:not(:focus):not(:placeholder-shown)]:text-[#8482F5]";
 
   const togglePasswordVisibility = () => {
     setShowPassword((currentValue) => !currentValue);
   };
 
   return (
-    <div className={`relative ${containerStyle}`}>
+    <div className={containerStyle}>
+      <div className="relative">
       <input
         id={id}
         required={required}
@@ -49,17 +69,21 @@ export function InputPassword({
         name={name}
         autoComplete={autoComplete}
         placeholder=" "
+        aria-describedby={describedBy}
+        aria-invalid={invalid}
         {...inputProps}
-        className="peer w-full rounded-[10px] border-2 border-[#8482F5] bg-white pl-10 pr-3.75 pt-3.75 pb-3.75 text-base text-black outline-none transition-all duration-400 ease-out focus:border-[#7CCA9E] focus:shadow-[0_5px_8px_rgba(124,202,158,0.3),0_10px_20px_rgba(124,202,158,0.2),0_15px_40px_rgba(124,202,158,0.15),0_20px_60px_rgba(124,202,158,0.1)]"
+        className={`peer w-full rounded-[10px] border-2 bg-white pl-10 pr-3.75 pt-3.75 pb-3.75 text-base text-black outline-none transition-all duration-400 ease-out ${inputStateClass}`}
       />
 
-      <RiLockPasswordLine className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-[20px] text-gray-400 transition-colors duration-300 peer-focus:text-[#7CCA9E]" />
+      <RiLockPasswordLine
+        className={`pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-[20px] transition-colors duration-300 ${iconStateClass}`}
+      />
 
       <button
         type="button"
         aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
         onClick={togglePasswordVisibility}
-        className="absolute right-4 top-1/2 z-10 flex -translate-y-1/2 items-center justify-center text-[25px] text-gray-400 outline-none transition-colors duration-300 hover:text-[#7CCA9E] focus:text-[#7CCA9E] cursor-pointer"
+        className="absolute right-4 top-1/2 z-10 flex -translate-y-1/2 cursor-pointer items-center justify-center text-[25px] text-gray-400 outline-none transition-colors duration-300 hover:text-[#7CCA9E] focus:text-[#7CCA9E]"
       >
         <AnimatePresence mode="wait" initial={false}>
           {showPassword ? (
@@ -88,10 +112,10 @@ export function InputPassword({
 
       <label
         htmlFor={id}
-        className="pointer-events-none absolute left-9 top-4 bg-white px-1.25 text-gray-400 transition-all duration-400 ease-out
+        className={`pointer-events-none absolute left-9 top-4 bg-white px-1.25 text-gray-400 transition-all duration-400 ease-out
   peer-focus:left-2.5 peer-focus:-translate-y-6.25 peer-focus:text-xs peer-focus:text-[#7CCA9E]
   peer-[:not(:placeholder-shown)]:left-2.5 peer-[:not(:placeholder-shown)]:-translate-y-6.25 peer-[:not(:placeholder-shown)]:text-xs
-  peer-[:not(:focus):not(:placeholder-shown)]:text-[#8482F5]"
+  peer-[:not(:focus):not(:placeholder-shown)]:text-[#8482F5] ${labelStateClass}`}
       >
         {label}
       </label>
@@ -110,6 +134,12 @@ export function InputPassword({
           }
         />
       ))}
+      </div>
+      {helperText ? (
+        <p id={helperTextId} className="mt-1.5 text-xs font-medium text-red-500">
+          {helperText}
+        </p>
+      ) : null}
     </div>
   );
 }

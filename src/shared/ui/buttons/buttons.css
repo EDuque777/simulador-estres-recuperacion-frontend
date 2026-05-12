@@ -34,6 +34,16 @@
   transition: all 700ms ease;
 }
 
+.gooey-button-red__blobs div {
+  background-color: red;
+  width: 34%;
+  height: 100%;
+  border-radius: 100%;
+  position: absolute;
+  transform: scale(1.4) translateY(125%) translateZ(0);
+  transition: all 700ms ease;
+}
+
 
 .gooey-button__blobs div:nth-child(1) {
   left: -5%;

@@ -29,7 +29,8 @@ export function LoginForm() {
       />
       <ButtonGooeyPurple
         type="submit"
-        text={isLoading ? "Enviando" : "Ingresar"}
+        text="Ingresar"
+        isLoading={isLoading}
         disabled={isLoading}
         width="w-full z-999"
       />

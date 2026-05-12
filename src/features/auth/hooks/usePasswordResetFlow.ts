@@ -2,6 +2,7 @@
 
 import { useCallback, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { usePasswordPairValidation } from "@/shared/ui/passwordStrength/usePasswordPairValidation";
 import { getFormValue } from "../lib/getFormValue";
 import {
   type PasswordResetStep,
@@ -28,6 +29,12 @@ export const usePasswordResetFlow = () => {
   const router = useRouter();
   const { forgotPassword, isLoading: isSendingCode } = useForgotPassword();
   const { resetPassword, isLoading: isResettingPassword } = useResetPassword();
+  const passwordValidation = usePasswordPairValidation();
+  const {
+    confirmPassword,
+    isPairValid,
+    password: newPassword,
+  } = passwordValidation;
   const {
     closePasswordResetModal,
     passwordResetCode,
@@ -96,12 +103,12 @@ export const usePasswordResetFlow = () => {
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const formData = new FormData(event.currentTarget);
-      const newPassword = getFormValue(formData, "newPassword");
-      const confirmPassword = getFormValue(formData, "confirmPassword");
-
       if (!passwordResetEmail || !passwordResetCode) {
         setPasswordResetStep("email", -1);
+        return;
+      }
+
+      if (!newPassword || !confirmPassword || !isPairValid) {
         return;
       }
 
@@ -123,6 +130,9 @@ export const usePasswordResetFlow = () => {
     },
     [
       closePasswordResetModal,
+      confirmPassword,
+      isPairValid,
+      newPassword,
       passwordResetCode,
       passwordResetEmail,
       resetPassword,
@@ -149,6 +159,7 @@ export const usePasswordResetFlow = () => {
     passwordResetCode,
     passwordResetDirection,
     passwordResetStep,
+    passwordValidation,
     title: getPasswordResetTitle(passwordResetStep),
   };
 };

@@ -7,6 +7,9 @@ import { ButtonGooeyPurple } from "@/shared/ui/buttons/ButtonGooeyPurple";
 import { InputEmail } from "@/shared/ui/inputs/InputEmail";
 import { InputPassword } from "@/shared/ui/inputs/InputPassword";
 import { InputText } from "@/shared/ui/inputs/InputText";
+import { PasswordMatchMessage } from "@/shared/ui/passwordStrength/PasswordMatchMessage";
+import { PasswordRequirements } from "@/shared/ui/passwordStrength/PasswordRequirements";
+import { PasswordStrengthBar } from "@/shared/ui/passwordStrength/PasswordStrengthBar";
 import { usePasswordResetFlow } from "../hooks/usePasswordResetFlow";
 import { useVerificationCodeForm } from "../hooks/useVerificationCodeForm";
 import {
@@ -52,7 +55,7 @@ const stepVariants = {
 function ModalShell({ children, onClose, title }: ModalShellProps) {
   return (
     <motion.div
-      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-1000 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -141,7 +144,8 @@ function VerificationCodeModal() {
         />
         <ButtonGooeyPurple
           type="submit"
-          text={isLoading ? "Verificando" : "Verificar"}
+          text="Verificar"
+          isLoading={isLoading}
           disabled={isSubmitDisabled}
           width="w-full z-999"
         />
@@ -164,7 +168,8 @@ function PasswordResetEmailStep({ flow }: { flow: PasswordResetFlow }) {
       />
       <ButtonGooeyPurple
         type="submit"
-        text={isSendingCode ? "Enviando" : "Enviar codigo"}
+        text="Enviar codigo"
+        isLoading={isSendingCode}
         disabled={isSendingCode}
         width="w-full z-999"
       />
@@ -203,8 +208,9 @@ function PasswordResetCodeStep({ flow }: { flow: PasswordResetFlow }) {
         />
         <ButtonGooeyPurple
           type="button"
-          text={isSendingCode ? "Enviando" : "Reenviar codigo"}
+          text="Reenviar codigo"
           onClick={handleResendCode}
+          isLoading={isSendingCode}
           disabled={isSendingCode}
           width="w-full z-999"
         />
@@ -218,29 +224,74 @@ function PasswordResetPasswordStep({ flow }: { flow: PasswordResetFlow }) {
     handleChangeCode,
     handlePasswordSubmit,
     isResettingPassword,
+    passwordValidation,
   } = flow;
+  const {
+    confirmPassword,
+    handleConfirmPasswordChange,
+    handlePasswordChange,
+    isPasswordValid,
+    password,
+    passwordsMatch,
+    requirements,
+    strength,
+  } = passwordValidation;
+  const isPasswordInvalid = password.length > 0 && !isPasswordValid;
+  const isConfirmPasswordInvalid =
+    confirmPassword.length > 0 && !passwordsMatch;
 
   return (
     <form noValidate onSubmit={handlePasswordSubmit} className="mt-7 flex flex-col gap-7">
-      <InputPassword
-        id="password-reset-new-password"
-        name="newPassword"
-        label="Nueva contrasena"
-        containerStyle="w-full"
-        autoComplete="new-password"
-        required
-      />
-      <InputPassword
-        id="password-reset-confirm-password"
-        name="confirmPassword"
-        label="Confirmar nueva contrasena"
-        containerStyle="w-full"
-        autoComplete="new-password"
-        required
-      />
+      <div className="w-full">
+        <InputPassword
+          id="password-reset-new-password"
+          name="newPassword"
+          label="Nueva contrasena"
+          containerStyle="w-full"
+          autoComplete="new-password"
+          value={password}
+          onChange={handlePasswordChange}
+          error={isPasswordInvalid}
+          aria-invalid={isPasswordInvalid}
+          aria-describedby="password-reset-requirements password-reset-strength"
+          required
+        />
+        <PasswordRequirements
+          id="password-reset-requirements"
+          requirements={requirements}
+          className="mt-3"
+        />
+        <PasswordStrengthBar
+          id="password-reset-strength"
+          strength={strength}
+          className="mt-3"
+        />
+      </div>
+      <div className="w-full">
+        <InputPassword
+          id="password-reset-confirm-password"
+          name="confirmPassword"
+          label="Confirmar nueva contrasena"
+          containerStyle="w-full"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={handleConfirmPasswordChange}
+          error={isConfirmPasswordInvalid}
+          aria-invalid={isConfirmPasswordInvalid}
+          aria-describedby="password-reset-match"
+          required
+        />
+        <PasswordMatchMessage
+          id="password-reset-match"
+          confirmPassword={confirmPassword}
+          passwordsMatch={passwordsMatch}
+          className="mt-2"
+        />
+      </div>
       <ButtonGooeyPurple
         type="submit"
-        text={isResettingPassword ? "Cambiando" : "Cambiar contrasena"}
+        text="Cambiar contrasena"
+        isLoading={isResettingPassword}
         disabled={isResettingPassword}
         width="w-full z-999"
       />

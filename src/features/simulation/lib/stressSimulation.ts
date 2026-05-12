@@ -22,8 +22,11 @@ export function simulateStressRecovery(
   const initialStress = clampStress(parameters.initialStress);
   const duration = Math.max(parameters.duration, parameters.timeStep);
   const timeStep = Math.max(parameters.timeStep, 0.1);
+  const equilibriumStress = clampStress(
+    parameters.externalPressure / parameters.recoveryRate,
+  );
   const points: StressPoint[] = [
-    createPoint(0, initialStress, parameters),
+    createPoint(0, initialStress, initialStress, parameters),
   ];
 
   let currentStress = initialStress;
@@ -35,24 +38,29 @@ export function simulateStressRecovery(
     const derivative = calculateStressDerivative(currentStress, parameters);
     const nextStress = clampStress(currentStress + deltaTime * derivative);
 
-    points.push(createPoint(nextTime, nextStress, parameters));
+    points.push(createPoint(nextTime, nextStress, initialStress, parameters));
     currentStress = nextStress;
     currentTime = nextTime;
   }
 
   const stressValues = points.map((point) => point.stress);
+  const errorValues = points.map((point) => point.error);
   const finalStress = stressValues[stressValues.length - 1] ?? initialStress;
+  const exactFinalStress =
+    points[points.length - 1]?.exactStress ?? initialStress;
+  const finalError = Math.abs(finalStress - exactFinalStress);
+  const maxError = Math.max(...errorValues);
   const peakStress = Math.max(...stressValues);
   const lowestStress = Math.min(...stressValues);
-  const equilibriumStress = clampStress(
-    parameters.externalPressure / parameters.recoveryRate,
-  );
   const riskLevel = getStressRiskLevel(finalStress);
   const trend = getStressTrend(initialStress, finalStress);
 
   return {
     points,
     finalStress: round(finalStress),
+    exactFinalStress: round(exactFinalStress),
+    finalError: round(finalError),
+    maxError: round(maxError),
     initialStress: round(initialStress),
     peakStress: round(peakStress),
     lowestStress: round(lowestStress),
@@ -70,6 +78,23 @@ export function calculateStressDerivative(
   return parameters.externalPressure - parameters.recoveryRate * stress;
 }
 
+export function calculateExactStress(
+  time: number,
+  parameters: Pick<
+    SimulationParameters,
+    "externalPressure" | "recoveryRate"
+  >,
+  initialStress: number,
+) {
+  const equilibriumStress = parameters.externalPressure / parameters.recoveryRate;
+  const exactStress =
+    equilibriumStress +
+    (initialStress - equilibriumStress) *
+      Math.exp(-parameters.recoveryRate * time);
+
+  return clampStress(exactStress);
+}
+
 export function getStressRiskLevel(stress: number): StressRiskLevel {
   if (stress >= 70) {
     return "high";
@@ -85,11 +110,16 @@ export function getStressRiskLevel(stress: number): StressRiskLevel {
 function createPoint(
   time: number,
   stress: number,
+  initialStress: number,
   parameters: SimulationParameters,
 ): StressPoint {
+  const exactStress = calculateExactStress(time, parameters, initialStress);
+
   return {
     time: round(time),
     stress: round(stress),
+    exactStress: round(exactStress),
+    error: round(Math.abs(stress - exactStress)),
     derivative: round(calculateStressDerivative(stress, parameters)),
   };
 }

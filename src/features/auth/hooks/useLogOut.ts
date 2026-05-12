@@ -11,11 +11,11 @@ export const useLogOut = () => {
     useLogOutMutation();
 
   const logOut = useCallback(async () => {
-    const response = await logOutMutation().unwrap();
-
-    dispatch(clearCredentials());
-
-    return response;
+    try {
+      return await logOutMutation().unwrap();
+    } finally {
+      dispatch(clearCredentials());
+    }
   }, [dispatch, logOutMutation]);
 
   return {

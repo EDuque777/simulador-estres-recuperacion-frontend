@@ -10,6 +10,7 @@ export function areParametersEqual(
     firstParameters.initialStress === secondParameters.initialStress &&
     firstParameters.externalPressure === secondParameters.externalPressure &&
     firstParameters.recoveryRate === secondParameters.recoveryRate &&
-    firstParameters.duration === secondParameters.duration
+    firstParameters.duration === secondParameters.duration &&
+    firstParameters.timeStep === secondParameters.timeStep
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Manrope } from "next/font/google";
 import { ReduxProvider } from "./providers/ReduxProvider";
+import { AuthSessionInitializer } from "@/features/auth/components/AuthSessionInitializer";
 import { AuthFlowModals } from "@/features/auth/components/AuthFlowModals";
 import { AppPreloader } from "@/shared/ui/loaders/AppPreloader";
 import "./globals.css";
@@ -36,6 +37,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-manrope">
         <ReduxProvider>
+          <AuthSessionInitializer />
           <AppPreloader minDuration={500} />
           {children}
           <AuthFlowModals />

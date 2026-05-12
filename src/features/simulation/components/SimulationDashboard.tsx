@@ -28,10 +28,15 @@ import { BsClipboardData } from "react-icons/bs";
 import { MetricCard } from "./MetricCard";
 import { areParametersEqual } from "../lib/areParametersEqual";
 import { AnimatePresence, motion } from "motion/react";
+import { MathematicalBreakdown } from "./MathematicalBreakdown";
 
 type EditableParameter = keyof Pick<
   SimulationParameters,
-  "initialStress" | "externalPressure" | "recoveryRate" | "duration"
+  | "initialStress"
+  | "externalPressure"
+  | "recoveryRate"
+  | "duration"
+  | "timeStep"
 >;
 
 type RiskPresentation = {
@@ -133,8 +138,8 @@ export function SimulationDashboard() {
               </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-5">
-              <div className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 lg:h-217 lg:items-stretch lg:grid-cols-[minmax(0,1fr)_400px] gap-5">
+              <div className="flex flex-col gap-5 lg:h-full lg:min-h-0">
                 <section className="rounded-[20px] p-7.5 bg-white shadow-2xl">
                   <StressGauge
                     helper={risk.helper}
@@ -168,8 +173,8 @@ export function SimulationDashboard() {
                 </section>
               </div>
 
-              <aside className="flex flex-col gap-5">
-                <section className="rounded-[20px] p-7.5 bg-white shadow-2xl">
+              <aside className="flex flex-col gap-5 lg:h-full lg:min-h-0">
+                <section className="rounded-[20px] p-7.5 bg-white shadow-2xl lg:h-full lg:min-h-0 lg:overflow-y-auto">
                   <div className="mb-7 flex flex-col items-start justify-start gap-3">
                     <div className="flex items-center gap-3">
                       {/* <FiSliders className="text-[#536dfe]" size={24} /> */}
@@ -193,7 +198,12 @@ export function SimulationDashboard() {
                   <div className="space-y-6">
                     <ParameterSlider
                       accentColor="bg-green-600"
-                      helper="S(0), valor inicial de la variable dependiente."
+                      guidance={[
+                        { range: "0-39%", label: "bajo" },
+                        { range: "40-69%", label: "moderado" },
+                        { range: "70-100%", label: "alto" },
+                      ]}
+                      helper="Nivel de estres con el que inicia la simulacion."
                       id="initialStress"
                       label="Estres inicial"
                       max={100}
@@ -208,7 +218,12 @@ export function SimulationDashboard() {
                     <ParameterSlider
                       accentColor="bg-yellow-600"
                       decimals={1}
-                      helper="a, presion externa que aumenta el estres por minuto."
+                      guidance={[
+                        { range: "0-1", label: "baja presion" },
+                        { range: "1.1-2.5", label: "presion media" },
+                        { range: "2.6-4", label: "alta presion" },
+                      ]}
+                      helper="Intensidad de las cargas externas que aumentan el estres."
                       id="externalPressure"
                       label="Presion externa"
                       max={4}
@@ -223,7 +238,12 @@ export function SimulationDashboard() {
                     <ParameterSlider
                       accentColor="bg-purple-600"
                       decimals={2}
-                      helper="b, capacidad de recuperacion del sistema."
+                      guidance={[
+                        { range: "0.01-0.06", label: "lenta" },
+                        { range: "0.07-0.13", label: "media" },
+                        { range: "0.14-0.20", label: "rapida" },
+                      ]}
+                      helper="Que tan rapido el sistema reduce el estres acumulado."
                       id="recoveryRate"
                       label="Capacidad de recuperacion"
                       max={0.2}
@@ -237,7 +257,12 @@ export function SimulationDashboard() {
                     />
                     <ParameterSlider
                       accentColor="bg-blue-600"
-                      helper="Horizonte temporal usado por el metodo de Euler."
+                      guidance={[
+                        { range: "10-60 min", label: "corto plazo" },
+                        { range: "65-120 min", label: "mediano plazo" },
+                        { range: "125-240 min", label: "largo plazo" },
+                      ]}
+                      helper="Cantidad total de minutos que se desean observar."
                       id="duration"
                       label="Tiempo de simulacion"
                       max={240}
@@ -248,6 +273,25 @@ export function SimulationDashboard() {
                       step={5}
                       unit="min"
                       value={draftParameters.duration}
+                    />
+                    <ParameterSlider
+                      accentColor="bg-cyan-600"
+                      guidance={[
+                        { range: "1-2 min", label: "mayor precision" },
+                        { range: "3-5 min", label: "precision media" },
+                        { range: "6-10 min", label: "mas aproximado" },
+                      ]}
+                      helper="Cada cuantos minutos avanza el modelo en un calculo."
+                      id="timeStep"
+                      label="Intervalo de Tiempo"
+                      max={10}
+                      min={1}
+                      onChange={(value) =>
+                        updateDraftParameter("timeStep", value)
+                      }
+                      step={1}
+                      unit="min"
+                      value={draftParameters.timeStep}
                     />
                   </div>
 
@@ -356,6 +400,8 @@ export function SimulationDashboard() {
                 </p>
               </div>
             </section>
+
+            <MathematicalBreakdown parameters={parameters} result={result} />
 
             <section className="mt-5 grid gap-5 xl:grid-cols-[1fr_1.1fr]">
               <div className="rounded-[20px] bg-blue-100 p-5 shadow-2xl">

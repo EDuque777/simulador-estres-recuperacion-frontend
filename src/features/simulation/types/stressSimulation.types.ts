@@ -11,12 +11,17 @@ export type SimulationParameters = {
 export type StressPoint = {
   time: number;
   stress: number;
+  exactStress: number;
+  error: number;
   derivative: number;
 };
 
 export type SimulationResult = {
   points: StressPoint[];
   finalStress: number;
+  exactFinalStress: number;
+  finalError: number;
+  maxError: number;
   initialStress: number;
   peakStress: number;
   lowestStress: number;

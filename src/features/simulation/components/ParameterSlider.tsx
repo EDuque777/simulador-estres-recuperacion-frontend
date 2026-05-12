@@ -3,6 +3,11 @@ import { FaPlus, FaMinus } from "react-icons/fa6";
 import SplitText from "@/shared/ui/animateText/SplitText";
 import { InputNumber } from "@/shared/ui/inputs/inputNumber";
 
+type ParameterGuidanceItem = {
+  range: string;
+  label: string;
+};
+
 type ParameterSliderProps = {
   id: string;
   label: string;
@@ -14,6 +19,7 @@ type ParameterSliderProps = {
   accentColor: string;
   decimals?: number;
   helper?: string;
+  guidance?: ParameterGuidanceItem[];
   onChange: (value: number) => void;
 };
 
@@ -28,6 +34,7 @@ export function ParameterSlider({
   accentColor,
   decimals = 0,
   helper,
+  guidance = [],
   onChange,
 }: ParameterSliderProps) {
   const displayValue =
@@ -154,6 +161,24 @@ export function ParameterSlider({
         <p className="mt-5 text-[15px] leading-snug font-bold text-gray-400">
           {helper}
         </p>
+      ) : null}
+
+      {guidance.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {guidance.map((item) => (
+            <div
+              key={`${item.range}-${item.label}`}
+              className="rounded-[10px] bg-[#f7f9ff] px-3 py-2"
+            >
+              <p className="text-[12px] font-extrabold text-[#8482F5]">
+                {item.range}
+              </p>
+              <p className="mt-1 text-[13px] font-bold leading-snug text-gray-400">
+                {item.label}
+              </p>
+            </div>
+          ))}
+        </div>
       ) : null}
     </div>
   );

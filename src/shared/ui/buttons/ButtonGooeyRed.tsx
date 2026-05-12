@@ -13,7 +13,7 @@ type ButtonGooeyProps = {
   width: string;
 };
 
-export function ButtonGooeyGreen({
+export function ButtonGooeyRed({
   type,
   text,
   onClick,
@@ -27,7 +27,7 @@ export function ButtonGooeyGreen({
         type={type}
         onClick={onClick}
         disabled={disabled || isLoading}
-        className={`gooey-button relative z-99 inline-block cursor-pointer overflow-hidden border-2 border-[#7CCA9E] px-[1.6em] py-[0.9em] align-middle text-[15px] font-bold uppercase tracking-[2px] text-[#7CCA9E] transition-all duration-700 ease-out hover:text-white ${width}`}
+        className={`bg-white gooey-button relative z-99 inline-block cursor-pointer overflow-hidden border-2 border-red-500 px-[1.6em] py-[0.9em] align-middle text-[15px] font-bold uppercase tracking-[2px] text-red-500 transition-all duration-700 ease-out hover:text-white ${width}`}
       >
         <AnimatePresence mode="wait" initial={false}>
           {isLoading ? (
@@ -54,7 +54,7 @@ export function ButtonGooeyGreen({
           )}
         </AnimatePresence>
 
-        <div className="gooey-button__blobs gooey-button-green__blobs">
+        <div className="gooey-button__blobs gooey-button-red__blobs">
           <div />
           <div />
           <div />

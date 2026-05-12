@@ -12,7 +12,6 @@ export function LoginPage() {
           speed={1}
         />
       </div>
-
       <section className="relative z-10 w-full md:w-137.5">
         <LoginCard />
       </section>

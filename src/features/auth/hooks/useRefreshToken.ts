@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { useRefreshTokenMutation } from "../api/authApi";
-import { setCredentials } from "../slices/authSlice";
+import { clearCredentials, setCredentials } from "../slices/authSlice";
 
 export const useRefreshToken = () => {
   const dispatch = useAppDispatch();
@@ -13,16 +13,21 @@ export const useRefreshToken = () => {
   ] = useRefreshTokenMutation();
 
   const refreshToken = useCallback(async () => {
-    const response = await refreshTokenMutation().unwrap();
+    try {
+      const response = await refreshTokenMutation().unwrap();
 
-    dispatch(
-      setCredentials({
-        accessToken: response.accessToken,
-        user: response.user,
-      }),
-    );
+      dispatch(
+        setCredentials({
+          accessToken: response.accessToken,
+          user: response.user,
+        }),
+      );
 
-    return response;
+      return response;
+    } catch (error) {
+      dispatch(clearCredentials());
+      throw error;
+    }
   }, [dispatch, refreshTokenMutation]);
 
   return {

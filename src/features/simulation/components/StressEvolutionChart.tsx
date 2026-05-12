@@ -249,7 +249,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { EChartsOption } from "echarts";
 import { EChartsCanvas } from "./EChartsCanvas";
 import type { StressPoint } from "../types/stressSimulation.types";
-import SplitText from "@/shared/ui/animateText/SplitText";
 
 type StressEvolutionChartProps = {
   equilibriumStress: number;
@@ -271,25 +270,34 @@ export function StressEvolutionChart({
   const [isEntranceAnimationActive, setIsEntranceAnimationActive] =
     useState(true);
 
-  const chartData = useMemo(
+  const eulerChartData = useMemo(
     () => points.map((point) => [point.time, point.stress]),
     [points],
   );
+  const exactChartData = useMemo(
+    () => points.map((point) => [point.time, point.exactStress]),
+    [points],
+  );
 
-  const animatedChartData = useMemo(() => {
+  const animatedEulerChartData = useMemo(() => {
     if (!isEntranceAnimationActive) {
-      return chartData;
+      return eulerChartData;
     }
 
-    return chartData.slice(
-      0,
-      Math.max(1, Math.min(entrancePointCount, chartData.length)),
-    );
-  }, [chartData, entrancePointCount, isEntranceAnimationActive]);
+    return sliceAnimatedData(eulerChartData, entrancePointCount);
+  }, [eulerChartData, entrancePointCount, isEntranceAnimationActive]);
+
+  const animatedExactChartData = useMemo(() => {
+    if (!isEntranceAnimationActive) {
+      return exactChartData;
+    }
+
+    return sliceAnimatedData(exactChartData, entrancePointCount);
+  }, [exactChartData, entrancePointCount, isEntranceAnimationActive]);
 
   useEffect(() => {
     const element = chartContainerRef.current;
-    const totalPoints = chartData.length;
+    const totalPoints = eulerChartData.length;
 
     if (!element || totalPoints <= 1 || hasPlayedEntranceAnimation.current) {
       return;
@@ -373,7 +381,7 @@ export function StressEvolutionChart({
       observer.disconnect();
       window.cancelAnimationFrame(animationFrameId);
     };
-  }, [chartData.length]);
+  }, [eulerChartData.length]);
 
   const option = useMemo<EChartsOption>(
     () => ({
@@ -487,7 +495,7 @@ export function StressEvolutionChart({
               type: "linear",
             },
           },
-          data: animatedChartData,
+          data: animatedEulerChartData,
           emphasis: {
             focus: "series",
           },
@@ -507,7 +515,28 @@ export function StressEvolutionChart({
             },
             silent: true,
           },
-          name: "Nivel de Estres",
+          name: "Euler",
+          showSymbol: false,
+          smooth: 0.38,
+          symbol: "circle",
+          symbolSize: 8,
+          type: "line",
+        },
+        {
+          id: "exact-solution-line",
+          animation: true,
+          data: animatedExactChartData,
+          emphasis: {
+            focus: "series",
+          },
+          lineStyle: {
+            color: "#8482F5",
+            shadowBlur: 10,
+            shadowColor: "rgba(132, 130, 245, 0.22)",
+            type: "dashed",
+            width: 3,
+          },
+          name: "Solucion exacta",
           showSymbol: false,
           smooth: 0.38,
           symbol: "circle",
@@ -545,7 +574,7 @@ export function StressEvolutionChart({
         },
       ],
     }),
-    [animatedChartData, duration, equilibriumStress],
+    [animatedEulerChartData, animatedExactChartData, duration, equilibriumStress],
   );
 
   return (
@@ -556,22 +585,20 @@ export function StressEvolutionChart({
         option={option}
       />
 
-      <div className="mt-3 flex items-center justify-center gap-2 text-xs font-semibold text-[#7180a5]">
-        <span className="h-1 w-8 rounded-full bg-linear-to-r from-[#52b86a] via-[#e7b42e] to-[#ef6958]" />
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-[#7180a5]">
+        <div className="flex items-center gap-2">
+          <span className="h-1 w-8 rounded-full bg-linear-to-r from-[#52b86a] via-[#e7b42e] to-[#ef6958]" />
+          <span className="text-[15px] font-bold leading-snug text-gray-400">
+            Euler
+          </span>
+        </div>
 
-        <SplitText
-          text="Nivel de Estres"
-          className="text-[15px] font-bold text-center leading-snug text-gray-400"
-          delay={50}
-          duration={1.25}
-          ease="power3.out"
-          splitType="chars"
-          from={{ opacity: 0, y: 40 }}
-          to={{ opacity: 1, y: 0 }}
-          threshold={0.1}
-          rootMargin="-100px"
-          textAlign="left"
-        />
+        <div className="flex items-center gap-2">
+          <span className="h-0 w-8 border-t-2 border-dashed border-[#8482F5]" />
+          <span className="text-[15px] font-bold leading-snug text-gray-400">
+            Solucion exacta
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -583,22 +610,42 @@ type TooltipDatum = {
 };
 
 function formatTooltip(params: unknown) {
-  const primaryParam = Array.isArray(params)
-    ? params.find(
-        (param) =>
-          isTooltipDatum(param) && param.seriesName === "Nivel de Estres",
-      ) ?? params[0]
-    : params;
+  const tooltipParams = Array.isArray(params)
+    ? params.filter(isTooltipDatum)
+    : isTooltipDatum(params)
+      ? [params]
+      : [];
+  const eulerParam = tooltipParams.find(
+    (param) => param.seriesName === "Euler",
+  );
+  const exactParam = tooltipParams.find(
+    (param) => param.seriesName === "Solucion exacta",
+  );
+  const primaryParam = eulerParam ?? exactParam ?? tooltipParams[0];
 
   if (!isTooltipDatum(primaryParam)) {
     return "";
   }
 
-  const [time, stress] = readChartTuple(primaryParam.value);
+  const [time, eulerStress] = readChartTuple(
+    (eulerParam ?? primaryParam).value,
+  );
+  const [, exactStress] = readChartTuple(
+    (exactParam ?? primaryParam).value,
+  );
+  const error = Math.abs(eulerStress - exactStress);
 
-  return `<strong>${Math.round(time)} min</strong><br/>Nivel de Estres: ${stress.toFixed(
+  return `<strong>${Math.round(time)} min</strong><br/>Euler: ${eulerStress.toFixed(
     1,
+  )}%<br/>Solucion exacta: ${exactStress.toFixed(
+    1,
+  )}%<br/>Error: ${error.toFixed(
+    2,
   )}%`;
+}
+
+function sliceAnimatedData(data: number[][], pointCount: number) {
+  return data.slice(0, Math.max(1, Math.min(pointCount, data.length)));
 }
 
 function readChartTuple(value: unknown): [number, number] {

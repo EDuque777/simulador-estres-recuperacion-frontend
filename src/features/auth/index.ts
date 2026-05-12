@@ -1,6 +1,9 @@
 export { LoginPage } from "./pages/LoginPage";
 export { SignUpPage } from "./pages/SignUpPage"
 export { AuthFlowModals } from "./components/AuthFlowModals";
+export { AuthSessionInitializer } from "./components/AuthSessionInitializer";
+export { LogOutButton } from "./components/LogOutButton";
+export { ProtectedRoute } from "./components/ProtectedRoute";
 export * from "./api/authApi";
 export * from "./hooks/useAuth";
 export * from "./hooks/useSignUp";

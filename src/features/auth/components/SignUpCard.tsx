@@ -47,7 +47,7 @@ export function SignUpCard() {
           deletingSpeed={50}
           variableSpeed={{ min: 60, max: 120 }}
           cursorBlinkDuration={0.5}
-          className="text-center leading-snug text-gray-400 font-semibold"
+          className="text-center leading-snug text-gray-400 font-semibold mt-1"
         />
       </div>
       <SignUpForm />
