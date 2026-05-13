@@ -36,6 +36,8 @@ const successMessages: Record<string, string> = {
     "Registro exitoso. Te enviamos un codigo de verificacion.",
   "Verification email sent":
     "Te enviamos un codigo de verificacion al correo.",
+  "Verification code sent successfully":
+    "Te enviamos un nuevo codigo de verificacion al correo.",
   "Sign in code sent": "Te enviamos un codigo para verificar el ingreso.",
   "Email verified successfully": "Correo verificado correctamente.",
   "Sign up verified successfully": "Registro verificado correctamente.",
@@ -46,7 +48,7 @@ const successMessages: Record<string, string> = {
   "Logged out successfully": "Sesion cerrada correctamente.",
 };
 
-const AUTH_SUCCESS_TOAST_DURATION_MS = 3000;
+const AUTH_SUCCESS_TOAST_DURATION_MS = 6000;
 const AUTH_REDIRECT_BUFFER_MS = 400;
 
 export function notifyAuthSuccess(
@@ -73,7 +75,7 @@ export function notifyAuthError(
     title,
     description: resolveErrorMessage(error, fallbackDescription),
     position: "top-center",
-    duration: 7000,
+    duration: 6000,
   });
 }
 
@@ -94,6 +96,13 @@ export function waitForAuthToastToClose() {
       AUTH_SUCCESS_TOAST_DURATION_MS + AUTH_REDIRECT_BUFFER_MS,
     );
   });
+}
+
+export function authErrorHasBackendMessage(
+  error: AuthRequestError,
+  backendMessage: string,
+) {
+  return getBackendMessages(error).includes(backendMessage);
 }
 
 function resolveSuccessMessage(

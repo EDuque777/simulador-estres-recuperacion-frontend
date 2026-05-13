@@ -28,6 +28,7 @@ const REAUTH_EXCLUDED_PATHS = new Set([
   "/auth/verify-sign-up-code",
   "/auth/verify-email",
   "/auth/sign-in",
+  "/auth/resend-verification-code",
   "/auth/verify-sign-in-code",
   "/auth/refresh-token",
   "/auth/log-out",

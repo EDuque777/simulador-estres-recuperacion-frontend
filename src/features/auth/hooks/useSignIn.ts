@@ -2,8 +2,15 @@
 
 import { useCallback } from "react";
 import { useSignInMutation } from "../api/authApi";
-import { notifyAuthError, notifyAuthSuccess } from "../lib/authToast";
+import {
+  authErrorHasBackendMessage,
+  notifyAuthError,
+  notifyAuthSuccess,
+  notifyAuthWarning,
+} from "../lib/authToast";
 import type { SignInRequest } from "../types/auth.types";
+
+export const EMAIL_NOT_VERIFIED_SIGN_IN_ERROR = "EMAIL_NOT_VERIFIED";
 
 export const useSignIn = () => {
   const [signInMutation, { data, error, isLoading, isSuccess, isError, reset }] =
@@ -15,7 +22,20 @@ export const useSignIn = () => {
 
       if ("error" in result) {
         notifyAuthError("No se pudo iniciar sesion", result.error);
+
+        if (authErrorHasBackendMessage(result.error, "Email not verified")) {
+          throw new Error(EMAIL_NOT_VERIFIED_SIGN_IN_ERROR);
+        }
+
         throw new Error("SIGN_IN_FAILED");
+      }
+
+      if (result.data.message === "Email not verified") {
+        notifyAuthWarning(
+          "Correo no verificado",
+          "Tu correo aun no esta verificado.",
+        );
+        throw new Error(EMAIL_NOT_VERIFIED_SIGN_IN_ERROR);
       }
 
       notifyAuthSuccess(

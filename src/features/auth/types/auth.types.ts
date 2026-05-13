@@ -29,6 +29,10 @@ export interface SignInRequest {
   password: string;
 }
 
+export interface ResendVerificationCodeRequest {
+  email: string;
+}
+
 export interface VerifyCodeRequest {
   email: string;
   code: string;

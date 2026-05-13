@@ -12,6 +12,7 @@ import { useAuthFlowStore } from "../stores/authFlowStore";
 import { waitForAuthToastToClose } from "../lib/authToast";
 import { useVerifySignInCode } from "./useVerifySignInCode";
 import { useVerifySignUpCode } from "./useVerifySignUpCode";
+import { useVerifyEmail } from "./useVerifyEmail";
 
 export const useVerificationCodeForm = () => {
   const router = useRouter();
@@ -24,15 +25,23 @@ export const useVerificationCodeForm = () => {
     useVerifySignInCode();
   const { verifySignUpCode, isLoading: isVerifyingSignUp } =
     useVerifySignUpCode();
+  const { verifyEmail, isLoading: isVerifyingEmail } = useVerifyEmail();
   const [code, setCode] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const isLoading = isVerifyingSignIn || isVerifyingSignUp || isRedirecting;
+  const isLoading =
+    isVerifyingSignIn || isVerifyingSignUp || isVerifyingEmail || isRedirecting;
   const normalizedCode = code.trim();
 
   const title = useMemo(() => {
-    return verificationType === "register"
-      ? "Verificar registro"
-      : "Verificar login";
+    if (verificationType === "register") {
+      return "Verificar registro";
+    }
+
+    if (verificationType === "emailVerification") {
+      return "Verificar correo";
+    }
+
+    return "Verificar login";
   }, [verificationType]);
 
   const handleCodeChange = useCallback(
@@ -59,6 +68,8 @@ export const useVerificationCodeForm = () => {
 
         if (verificationType === "register") {
           await verifySignUpCode(request);
+        } else if (verificationType === "emailVerification") {
+          await verifyEmail(request);
         } else {
           await verifySignInCode(request);
         }
@@ -78,6 +89,7 @@ export const useVerificationCodeForm = () => {
       router,
       verificationEmail,
       verificationType,
+      verifyEmail,
       verifySignInCode,
       verifySignUpCode,
     ],

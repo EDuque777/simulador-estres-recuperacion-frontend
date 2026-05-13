@@ -1,12 +1,24 @@
 "use client";
 
-import { useCallback, type SubmitEvent } from "react";
+import { useCallback, useState, type SubmitEvent } from "react";
 import { getFormValue } from "../lib/getFormValue";
 import { useAuthFlowStore } from "../stores/authFlowStore";
-import { useSignIn } from "./useSignIn";
+import { useResendVerificationCode } from "./useResendVerificationCode";
+import {
+  EMAIL_NOT_VERIFIED_SIGN_IN_ERROR,
+  useSignIn,
+} from "./useSignIn";
+
+const isEmailNotVerifiedError = (error: unknown) =>
+  error instanceof Error && error.message === EMAIL_NOT_VERIFIED_SIGN_IN_ERROR;
 
 export const useLoginForm = () => {
   const { signIn, isLoading } = useSignIn();
+  const {
+    resendVerificationCode,
+    isLoading: isResendingVerificationCode,
+  } = useResendVerificationCode();
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
   const openVerificationModal = useAuthFlowStore(
     (state) => state.openVerificationModal,
   );
@@ -23,18 +35,41 @@ export const useLoginForm = () => {
         return;
       }
 
+      setUnverifiedEmail("");
+
       try {
         await signIn({ email, password });
         openVerificationModal({ email, type: "login" });
-      } catch {
-        // No se muestran mensajes visuales todavia.
+      } catch (error) {
+        if (isEmailNotVerifiedError(error)) {
+          setUnverifiedEmail(email);
+        }
       }
     },
     [openVerificationModal, signIn],
   );
 
+  const handleResendVerificationCode = useCallback(async () => {
+    if (!unverifiedEmail) {
+      return;
+    }
+
+    try {
+      await resendVerificationCode({ email: unverifiedEmail });
+      openVerificationModal({
+        email: unverifiedEmail,
+        type: "emailVerification",
+      });
+    } catch {
+      // El toast del hook conserva el motivo visible para el usuario.
+    }
+  }, [openVerificationModal, resendVerificationCode, unverifiedEmail]);
+
   return {
     handleSubmit,
+    handleResendVerificationCode,
     isLoading,
+    isResendingVerificationCode,
+    unverifiedEmail,
   };
 };

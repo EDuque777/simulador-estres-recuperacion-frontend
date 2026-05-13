@@ -314,6 +314,11 @@
   --uib-color: #7CCA9E;
 }
 
+.dot-spinner--red {
+  --uib-color: red;
+}
+
+
 .dot-spinner__dot {
   position: absolute;
   top: 0;

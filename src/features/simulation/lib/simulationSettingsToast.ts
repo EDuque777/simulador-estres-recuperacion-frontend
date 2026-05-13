@@ -25,7 +25,7 @@ export function notifySimulationSettingsSaved(message: string | undefined) {
         ? successMessages[message]
         : "La configuracion del simulador fue guardada correctamente.",
     position: "top-center",
-    duration: 3000,
+    duration: 6000,
   });
 }
 
@@ -38,7 +38,7 @@ export function notifySimulationSettingsError(
     title: "Error en la configuracion",
     description: resolveSimulationSettingsError(error, fallbackDescription),
     position: "top-center",
-    duration: 7000,
+    duration: 6000,
   });
 }
 

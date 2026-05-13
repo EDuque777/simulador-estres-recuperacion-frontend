@@ -175,7 +175,7 @@ export function SimulationDashboard() {
               </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:h-237.5 lg:items-stretch lg:grid-cols-[minmax(0,1fr)_420px] gap-5">
+            <div className="grid grid-cols-1 lg:h-242.5 xl:h-253 2xl:h-242.5 lg:items-stretch lg:grid-cols-[minmax(0,1fr)_420px] gap-5">
               <div className="flex flex-col gap-5 lg:h-full lg:min-h-0">
                 <section className="rounded-[20px] p-7.5 bg-white shadow-2xl">
                   <StressGauge

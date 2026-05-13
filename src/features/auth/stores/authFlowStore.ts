@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type VerificationFlowType = "register" | "login";
+export type VerificationFlowType = "register" | "login" | "emailVerification";
 export type PasswordResetStep = "email" | "code" | "password";
 export type FlowDirection = -1 | 1;
 

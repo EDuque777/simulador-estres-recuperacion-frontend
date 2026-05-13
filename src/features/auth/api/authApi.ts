@@ -4,6 +4,7 @@ import type {
   BaseAuthResponse,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  ResendVerificationCodeRequest,
   SignInRequest,
   SignUpRequest,
   VerifyCodeRequest,
@@ -35,6 +36,16 @@ export const authApi = baseApi.injectEndpoints({
     signIn: builder.mutation<BaseAuthResponse, SignInRequest>({
       query: (body) => ({
         url: "/auth/sign-in",
+        method: "POST",
+        body,
+      }),
+    }),
+    resendVerificationCode: builder.mutation<
+      BaseAuthResponse,
+      ResendVerificationCodeRequest
+    >({
+      query: (body) => ({
+        url: "/auth/resend-verification-code",
         method: "POST",
         body,
       }),
@@ -84,6 +95,7 @@ export const {
   useVerifySignUpCodeMutation,
   useVerifyEmailMutation,
   useSignInMutation,
+  useResendVerificationCodeMutation,
   useVerifySignInCodeMutation,
   useRefreshTokenMutation,
   useLogOutMutation,

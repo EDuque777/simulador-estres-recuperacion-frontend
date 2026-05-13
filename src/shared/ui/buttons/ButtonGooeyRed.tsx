@@ -2,7 +2,7 @@
 
 import "./buttons.css";
 import { AnimatePresence, motion } from "motion/react";
-import { DotSpinnerGreenLoader } from "../loaders/DotSpinnerGreenLoader";
+import { DotSpinnerRedLoader } from "../loaders/DotSpinnerRedLoader";
 
 type ButtonGooeyProps = {
   type: "button" | "submit" | "reset";
@@ -39,7 +39,7 @@ export function ButtonGooeyRed({
               transition={{ duration: 0.2 }}
               className="relative z-10 flex items-center justify-center"
             >
-              <DotSpinnerGreenLoader />
+              <DotSpinnerRedLoader />
             </motion.div>
           ) : (
             <motion.p
