@@ -8,6 +8,19 @@ export type SimulationParameters = {
   timeStep: number;
 };
 
+export type SimulationSettings = SimulationParameters & {
+  id: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SimulationSettingsResponse = {
+  status: number;
+  message: string;
+  settings: SimulationSettings;
+};
+
 export type StressPoint = {
   time: number;
   stress: number;

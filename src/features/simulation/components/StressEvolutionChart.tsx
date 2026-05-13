@@ -245,7 +245,7 @@
 
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import type { EChartsOption } from "echarts";
 import { EChartsCanvas } from "./EChartsCanvas";
 import type { StressPoint } from "../types/stressSimulation.types";
@@ -256,20 +256,13 @@ type StressEvolutionChartProps = {
   duration: number;
 };
 
-const ENTRANCE_ANIMATION_DURATION = 1800;
+const EQUILIBRIUM_TOLERANCE = 1;
 
 export function StressEvolutionChart({
   equilibriumStress,
   points,
   duration,
 }: StressEvolutionChartProps) {
-  const chartContainerRef = useRef<HTMLDivElement | null>(null);
-  const hasPlayedEntranceAnimation = useRef(false);
-
-  const [entrancePointCount, setEntrancePointCount] = useState(1);
-  const [isEntranceAnimationActive, setIsEntranceAnimationActive] =
-    useState(true);
-
   const eulerChartData = useMemo(
     () => points.map((point) => [point.time, point.stress]),
     [points],
@@ -278,110 +271,10 @@ export function StressEvolutionChart({
     () => points.map((point) => [point.time, point.exactStress]),
     [points],
   );
-
-  const animatedEulerChartData = useMemo(() => {
-    if (!isEntranceAnimationActive) {
-      return eulerChartData;
-    }
-
-    return sliceAnimatedData(eulerChartData, entrancePointCount);
-  }, [eulerChartData, entrancePointCount, isEntranceAnimationActive]);
-
-  const animatedExactChartData = useMemo(() => {
-    if (!isEntranceAnimationActive) {
-      return exactChartData;
-    }
-
-    return sliceAnimatedData(exactChartData, entrancePointCount);
-  }, [exactChartData, entrancePointCount, isEntranceAnimationActive]);
-
-  useEffect(() => {
-    const element = chartContainerRef.current;
-    const totalPoints = eulerChartData.length;
-
-    if (!element || totalPoints <= 1 || hasPlayedEntranceAnimation.current) {
-      return;
-    }
-
-    let animationFrameId = 0;
-    let startedAt = 0;
-    let lastPointCount = 1;
-
-    const animateLine = (currentTime: number) => {
-      if (startedAt === 0) {
-        startedAt = currentTime;
-      }
-
-      const elapsedTime = currentTime - startedAt;
-      const progress = Math.min(
-        elapsedTime / ENTRANCE_ANIMATION_DURATION,
-        1,
-      );
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-
-      const nextPointCount = Math.max(
-        1,
-        Math.ceil(easedProgress * totalPoints),
-      );
-
-      if (nextPointCount !== lastPointCount) {
-        lastPointCount = nextPointCount;
-        setEntrancePointCount(nextPointCount);
-      }
-
-      if (progress < 1) {
-        animationFrameId = window.requestAnimationFrame(animateLine);
-        return;
-      }
-
-      setEntrancePointCount(totalPoints);
-      setIsEntranceAnimationActive(false);
-    };
-
-    const startEntranceAnimation = () => {
-      if (hasPlayedEntranceAnimation.current) {
-        return;
-      }
-
-      hasPlayedEntranceAnimation.current = true;
-
-      animationFrameId = window.requestAnimationFrame(() => {
-        setIsEntranceAnimationActive(true);
-        setEntrancePointCount(1);
-
-        animationFrameId = window.requestAnimationFrame(animateLine);
-      });
-    };
-
-    if (typeof IntersectionObserver === "undefined") {
-      startEntranceAnimation();
-
-      return () => {
-        window.cancelAnimationFrame(animationFrameId);
-      };
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-
-        startEntranceAnimation();
-        observer.disconnect();
-      },
-      {
-        threshold: 0.35,
-      },
-    );
-
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-      window.cancelAnimationFrame(animationFrameId);
-    };
-  }, [eulerChartData.length]);
+  const equilibriumInsight = useMemo(
+    () => buildEquilibriumInsight(points, equilibriumStress, duration),
+    [duration, equilibriumStress, points],
+  );
 
   const option = useMemo<EChartsOption>(
     () => ({
@@ -495,7 +388,7 @@ export function StressEvolutionChart({
               type: "linear",
             },
           },
-          data: animatedEulerChartData,
+          data: eulerChartData,
           emphasis: {
             focus: "series",
           },
@@ -525,7 +418,7 @@ export function StressEvolutionChart({
         {
           id: "exact-solution-line",
           animation: true,
-          data: animatedExactChartData,
+          data: exactChartData,
           emphasis: {
             focus: "series",
           },
@@ -574,11 +467,11 @@ export function StressEvolutionChart({
         },
       ],
     }),
-    [animatedEulerChartData, animatedExactChartData, duration, equilibriumStress],
+    [duration, equilibriumStress, eulerChartData, exactChartData],
   );
 
   return (
-    <div ref={chartContainerRef} className="w-full overflow-hidden">
+    <div className="w-full overflow-hidden">
       <EChartsCanvas
         ariaLabel="Grafica interactiva de evolucion del estres"
         className="h-67.5 w-full md:h-80"
@@ -599,6 +492,15 @@ export function StressEvolutionChart({
             Solucion exacta
           </span>
         </div>
+      </div>
+
+      <div className="mt-4 rounded-[10px] bg-[#f7f9ff] px-4 py-3 text-center">
+        <p className="text-[12px] font-extrabold uppercase tracking-[1px] text-[#8482F5]">
+          {equilibriumInsight.title}
+        </p>
+        <p className="mt-1 text-[14px] font-bold leading-snug text-gray-400">
+          {equilibriumInsight.description}
+        </p>
       </div>
     </div>
   );
@@ -644,8 +546,79 @@ function formatTooltip(params: unknown) {
   )}%`;
 }
 
-function sliceAnimatedData(data: number[][], pointCount: number) {
-  return data.slice(0, Math.max(1, Math.min(pointCount, data.length)));
+type EquilibriumInsight = {
+  title: string;
+  description: string;
+};
+
+function buildEquilibriumInsight(
+  points: StressPoint[],
+  equilibriumStress: number,
+  duration: number,
+): EquilibriumInsight {
+  const initialPoint = points[0];
+  const finalPoint = points[points.length - 1];
+
+  if (!initialPoint || !finalPoint) {
+    return {
+      title: "Equilibrio no disponible",
+      description:
+        "Ajusta los parametros y ejecuta la simulacion para ver cuando se estabiliza la curva.",
+    };
+  }
+
+  if (
+    Math.abs(initialPoint.exactStress - equilibriumStress) <=
+    EQUILIBRIUM_TOLERANCE
+  ) {
+    return {
+      title: "Equilibrio desde el inicio",
+      description: `El estres inicia esta muy cerca de ${formatPercent(
+        equilibriumStress,
+      )}; por eso la grafica casi no cambia con el tiempo.`,
+    };
+  }
+
+  const stablePoint = points.find(
+    (point) =>
+      point.time > 0 &&
+      Math.abs(point.exactStress - equilibriumStress) <=
+        EQUILIBRIUM_TOLERANCE,
+  );
+
+  if (stablePoint) {
+    return {
+      title: `Equilibrio aproximado en ${formatMinutes(stablePoint.time)}`,
+      description: `Desde ahi la curva queda a menos de ${EQUILIBRIUM_TOLERANCE}% de ${formatPercent(
+        equilibriumStress,
+      )}; por eso se ve plana aunque el eje continue hasta ${formatMinutes(
+        duration,
+      )}.`,
+    };
+  }
+
+  return {
+    title: "Equilibrio fuera del rango",
+    description: `Al final aun queda a ${formatPercent(
+      Math.abs(finalPoint.exactStress - equilibriumStress),
+    )} del equilibrio; aumenta el tiempo para ver mas convergencia.`,
+  };
+}
+
+function formatMinutes(value: number) {
+  return `${formatNumber(value)} min`;
+}
+
+function formatPercent(value: number) {
+  return `${formatNumber(value)}%`;
+}
+
+function formatNumber(value: number) {
+  const roundedValue = Number(value.toFixed(1));
+
+  return Number.isInteger(roundedValue)
+    ? roundedValue.toFixed(0)
+    : roundedValue.toFixed(1);
 }
 
 function readChartTuple(value: unknown): [number, number] {

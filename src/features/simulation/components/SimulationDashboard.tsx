@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FiActivity,
   FiInfo,
@@ -29,6 +29,7 @@ import { MetricCard } from "./MetricCard";
 import { areParametersEqual } from "../lib/areParametersEqual";
 import { AnimatePresence, motion } from "motion/react";
 import { MathematicalBreakdown } from "./MathematicalBreakdown";
+import { useSimulationSettings } from "../hooks/useSimulationSettings";
 
 type EditableParameter = keyof Pick<
   SimulationParameters,
@@ -74,12 +75,36 @@ export function SimulationDashboard() {
   const [draftParameters, setDraftParameters] = useState<SimulationParameters>(
     DEFAULT_SIMULATION_PARAMETERS,
   );
+  const [savedParameters, setSavedParameters] = useState<SimulationParameters>(
+    DEFAULT_SIMULATION_PARAMETERS,
+  );
+  const hasLoadedSettings = useRef(false);
+  const {
+    loadedSettings,
+    isLoadingSettings,
+    isSavingSettings,
+    saveSimulationSettings,
+  } = useSimulationSettings();
   const result = useMemo(
     () => simulateStressRecovery(parameters),
     [parameters],
   );
   const risk = riskPresentation[result.riskLevel];
-  const hasPendingChanges = !areParametersEqual(parameters, draftParameters);
+  const hasPendingChanges = !areParametersEqual(
+    savedParameters,
+    draftParameters,
+  );
+
+  useEffect(() => {
+    if (!loadedSettings || hasLoadedSettings.current) {
+      return;
+    }
+
+    hasLoadedSettings.current = true;
+    setParameters(loadedSettings);
+    setDraftParameters(loadedSettings);
+    setSavedParameters(loadedSettings);
+  }, [loadedSettings]);
 
   const updateDraftParameter = (key: EditableParameter, value: number) => {
     setDraftParameters((currentParameters) => ({
@@ -95,6 +120,18 @@ export function SimulationDashboard() {
   const resetSimulation = () => {
     setParameters(DEFAULT_SIMULATION_PARAMETERS);
     setDraftParameters(DEFAULT_SIMULATION_PARAMETERS);
+  };
+
+  const handleSaveSimulationSettings = async () => {
+    const nextParameters = await saveSimulationSettings(draftParameters);
+
+    if (!nextParameters) {
+      return;
+    }
+
+    setParameters(nextParameters);
+    setDraftParameters(nextParameters);
+    setSavedParameters(nextParameters);
   };
 
   return (
@@ -138,7 +175,7 @@ export function SimulationDashboard() {
               </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:h-217 lg:items-stretch lg:grid-cols-[minmax(0,1fr)_400px] gap-5">
+            <div className="grid grid-cols-1 lg:h-237.5 lg:items-stretch lg:grid-cols-[minmax(0,1fr)_420px] gap-5">
               <div className="flex flex-col gap-5 lg:h-full lg:min-h-0">
                 <section className="rounded-[20px] p-7.5 bg-white shadow-2xl">
                   <StressGauge
@@ -300,12 +337,24 @@ export function SimulationDashboard() {
                       type="button"
                       text="Simular"
                       onClick={runSimulation}
+                      disabled={isLoadingSettings}
+                      width="w-full z-999"
+                    />
+                    <ButtonGooeyGreen
+                      type="button"
+                      text="Guardar cambios"
+                      onClick={handleSaveSimulationSettings}
+                      isLoading={isSavingSettings}
+                      disabled={
+                        isLoadingSettings || isSavingSettings || !hasPendingChanges
+                      }
                       width="w-full z-999"
                     />
                     <ButtonGooeyGreen
                       type="button"
                       text="Reiniciar"
                       onClick={resetSimulation}
+                      disabled={isLoadingSettings || isSavingSettings}
                       width="w-full z-999"
                     />
                     {/* {hasPendingChanges ? (
@@ -342,7 +391,7 @@ export function SimulationDashboard() {
                           }}
                           className="rounded-full bg-[#eef3ff] px-3 py-1 text-[14px] font-extrabold text-blue-600"
                         >
-                          Se encontraron cambios
+                          Cambios sin guardar
                         </motion.span>
                       ) : null}
                     </AnimatePresence>
